@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block Letter FX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0d0d0d;
+      color: #ccc;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem 4rem;
+      gap: 2.5rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: clamp(2rem, 8vw, 4rem);
+      letter-spacing: 0.06em;
+      color: #f0f0f0;
+      text-shadow: 4px 4px 0 #cc2200, 8px 8px 0 #111;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #555;
+      letter-spacing: 0.04em;
+    }
+
+    .controls {
+      width: min(100%, 640px);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    label {
+      font-size: 0.75rem;
+      color: #666;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    label.grow { flex: 1; min-width: 180px; }
+
+    input[type="text"] {
+      width: 100%;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #f0f0f0;
+      font-size: 1rem;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      letter-spacing: 0.06em;
+      padding: 0.55rem 0.8rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input[type="text"]:focus { border-color: #cc2200; }
+
+    input[type="color"] {
+      width: 48px;
+      height: 38px;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      background: #1a1a1a;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #cc2200;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    button {
+      background: #cc2200;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      letter-spacing: 0.1em;
+      padding: 0.6rem 1.4rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    button:hover { background: #e02800; }
+
+    .canvas-wrap {
+      width: min(100%, 640px);
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 1.2rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    #sign-canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      image-rendering: crisp-edges;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      width: min(100%, 640px);
+    }
+
+    .actions button {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      color: #aaa;
+    }
+    .actions button:hover { background: #2a2a2a; color: #fff; }
+
+    footer {
+      margin-top: auto;
+      font-size: 0.72rem;
+      color: #333;
+      letter-spacing: 0.04em;
+    }
+    footer a { color: #444; text-decoration: none; }
+    footer a:hover { color: #666; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Block Letter FX</h1>
+    <p>Sign-painted 3-layer extrusion effect — white face · red mid · black depth</p>
+  </header>
+
+  <div class="controls">
+    <div class="row">
+      <label class="grow">
+        Text
+        <input type="text" id="txt" value="THIS MUST BE THE PLACE" maxlength="60" spellcheck="false">
+      </label>
+      <button id="render-btn">Render</button>
+    </div>
+
+    <div class="range-row">
+      <label>
+        Depth <span id="depth-val">9</span>%
+        <input type="range" id="depth" min="2" max="25" value="9">
+      </label>
+      <label>
+        Letter spacing <span id="spacing-val">2</span>px
+        <input type="range" id="spacing" min="0" max="12" value="2">
+      </label>
+    </div>
+
+    <div class="row">
+      <label>
+        Face color
+        <input type="color" id="col-face" value="#f0f0f0">
+      </label>
+      <label>
+        Mid color
+        <input type="color" id="col-mid" value="#cc2200">
+      </label>
+      <label>
+        Deep color
+        <input type="color" id="col-deep" value="#111111">
+      </label>
+      <label>
+        Background
+        <input type="color" id="col-bg" value="#1a1a1a">
+      </label>
+    </div>
+  </div>
+
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="sign-canvas"></canvas>
+  </div>
+
+  <div class="actions">
+    <button id="copy-btn">Copy image</button>
+    <button id="dl-btn">Download PNG</button>
+  </div>
+
+  <footer>
+    Inspired by the <a href="https://www.thebanner.com/community/local-news/this-must-be-the-place-mural-painted-espo-DMKP5D3IJNCWZEDL6NW6JOGKCE/" target="_blank" rel="noopener">"This Must Be The Place"</a> mural &mdash; <a href="https://github.com/sanawgs/block-letter-fx" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+
+  <script src="block-letter-fx.js"></script>
+  <script>
+  (function () {
+    var canvas    = document.getElementById('sign-canvas');
+    var txtEl     = document.getElementById('txt');
+    var depthEl   = document.getElementById('depth');
+    var spacingEl = document.getElementById('spacing');
+    var depthVal  = document.getElementById('depth-val');
+    var spacingVal= document.getElementById('spacing-val');
+    var colFace   = document.getElementById('col-face');
+    var colMid    = document.getElementById('col-mid');
+    var colDeep   = document.getElementById('col-deep');
+    var colBg     = document.getElementById('col-bg');
+    var wrap      = document.getElementById('canvas-wrap');
+
+    function draw() {
+      blockLetterFX(canvas, txtEl.value.trim() || 'TYPE SOMETHING', {
+        faceColor: colFace.value,
+        midColor:  colMid.value,
+        deepColor: colDeep.value,
+        depthPct:  parseInt(depthEl.value, 10) / 100,
+        spacing:   parseInt(spacingEl.value, 10),
+        padding:   24,
+      });
+    }
+
+    depthEl.addEventListener('input',   function () { depthVal.textContent   = depthEl.value;   draw(); });
+    spacingEl.addEventListener('input', function () { spacingVal.textContent = spacingEl.value; draw(); });
+    colFace.addEventListener('input', draw);
+    colMid.addEventListener('input',  draw);
+    colDeep.addEventListener('input', draw);
+    colBg.addEventListener('input',   function () { wrap.style.background = colBg.value; draw(); });
+    txtEl.addEventListener('input',   draw);
+    document.getElementById('render-btn').addEventListener('click', draw);
+
+    document.getElementById('dl-btn').addEventListener('click', function () {
+      var link = document.createElement('a');
+      link.download = (txtEl.value.trim() || 'block-letter-fx').toLowerCase().replace(/\s+/g, '-') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    document.getElementById('copy-btn').addEventListener('click', function () {
+      if (!navigator.clipboard || !window.ClipboardItem) { alert('Clipboard API not available.'); return; }
+      canvas.toBlob(function (blob) {
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+          .then(function () { flash('Copied!'); })
+          .catch(function () { alert('Copy failed — use download instead.'); });
+      }, 'image/png');
+    });
+
+    function flash(msg) {
+      var btn = document.getElementById('copy-btn'), orig = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = orig; }, 1400);
+    }
+
+    wrap.style.background = colBg.value;
+    draw();
+  })();
+  </script>
+
+</body>
+</html>
